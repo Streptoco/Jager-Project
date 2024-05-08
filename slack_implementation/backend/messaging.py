@@ -32,7 +32,7 @@ def onMessage(message):
     print("Message: " + text)
     print(message)
     if "@"+client.bot in text:
-        botMessage = client.slack_client.chat_postMessage(channel=channel,text="I'm Thinking...")
+        #botMessage = client.slack_client.chat_postMessage(channel=channel,text="I'm Thinking...")
         '''
         body = {
             "model": "llama3",
@@ -56,6 +56,7 @@ def onMessage(message):
         # content = response_data["message"]["content"]
         content = response_data["response"]
         #client.chat_postMessage(channel=channel,text=content)
-        client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
+        #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
+        client.slack_client.chat_postMessage(channel=channel,text=content)
 
 app.run(host='0.0.0.0', port=5000, debug=True)
