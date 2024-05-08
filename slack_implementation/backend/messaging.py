@@ -4,14 +4,13 @@ import os
 from flask import Flask
 from slackeventsapi import SlackEventAdapter as eventAdapter
 import requests
-import sys
-sys.path.insert(0,'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\jager-common')
-import common-runtime
+from jager_common import common_runtime
+
 app = Flask(__name__)
 
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 
-
+client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 bot = client.api_call("auth.test")['user_id']
 
