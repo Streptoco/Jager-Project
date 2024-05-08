@@ -4,15 +4,16 @@ import os
 from flask import Flask
 from slackeventsapi import SlackEventAdapter as eventAdapter
 import requests
-from jager_common import common_runtime
+from jager_common.slack_client import SlackClient
+import messaging_parser
 
 app = Flask(__name__)
 
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 
-client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-
-bot = client.api_call("auth.test")['user_id']
+#client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+#bot = client.api_call("auth.test")['user_id']
+client = SlackClient()
 
 # local ollama instance
 chatUrl = 'http://localhost:11434/api/chat'
@@ -25,12 +26,13 @@ def onMessage(message):
     # print(message)
     event = message.get('event', {})
     channel = event.get('channel')
-    user = event.get('user')
-    responeUser = client.users_info(user=user)
     text = event.get('text')
-    print(responeUser['user']['real_name'])
-    if bot in text:
-        botMessage = client.chat_postMessage(channel=channel,text="I'm Thinking...")
+    print("Bot GUID:" + client.bot)
+    print("Username: " + messaging_parser.get_real_name(message, client))
+    print("Message: " + text)
+    print(message)
+    if "@"+client.bot in text:
+        botMessage = client.slack_client.chat_postMessage(channel=channel,text="I'm Thinking...")
         '''
         body = {
             "model": "llama3",
@@ -54,6 +56,6 @@ def onMessage(message):
         # content = response_data["message"]["content"]
         content = response_data["response"]
         #client.chat_postMessage(channel=channel,text=content)
-        client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
+        client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
 
 app.run(host='0.0.0.0', port=5000, debug=True)
