@@ -7,10 +7,11 @@ from slackeventsapi import SlackEventAdapter as eventAdapter
 import requests
 from jager_common.slack_client import SlackClient
 import messaging_parser
+from main import *
 
 app = Flask(__name__)
-
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
+
 
 #client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 #bot = client.api_call("auth.test")['user_id']
