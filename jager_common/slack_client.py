@@ -17,6 +17,6 @@ class SlackClient:
 
     def check_if_can_send(self):
         if self.num_of_messages == 0:
-            return True
+            return Truevim
         else:
             return False

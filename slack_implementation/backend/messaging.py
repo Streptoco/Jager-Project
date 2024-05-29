@@ -7,10 +7,11 @@ from slackeventsapi import SlackEventAdapter as eventAdapter
 import requests
 from jager_common.slack_client import SlackClient
 import messaging_parser
+from main import *
 
-app = Flask(__name__)
+#app = Flask(__name__)
+eventAdapter = eventAdapter("407928f31731db7fa3d02490ae1d0f3f", '/slack/events', app)
 
-eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 
 #client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 #bot = client.api_call("auth.test")['user_id']
@@ -64,4 +65,4 @@ def onMessage(message):
         client.post_sending()
 
 
-app.run(host='0.0.0.0', port=5000, debug=True)
+#app.run(host='0.0.0.0', port=5000, debug=True)
