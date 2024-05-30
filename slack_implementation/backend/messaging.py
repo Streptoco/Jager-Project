@@ -10,7 +10,7 @@ import messaging_parser
 from main import *
 from ollama import generate
 
-#app = Flask(__name__)
+app = Flask(__name__)
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 
 
@@ -70,4 +70,4 @@ def onMessage(message):
         client.post_sending()
 #app.run(host='0.0.0.0', port=5000, debug=True)
 #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.crt', 'key.key'))
-#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
