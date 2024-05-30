@@ -55,13 +55,15 @@ def onMessage(message):
             "prompt": text,
             "stream": False
         }
-        #response = requests.post(generateUrl, json=body)
-        #response_data = json.loads(response.text)
+        response = requests.post(generateUrl, json=body)
+        response_data = json.loads(response.text)
         print("FOR ME!")
         # content = response_data["message"]["content"]
-        #content = response_data["response"]
-        response = generate('llama3', text)
-        content = response['response']
+        content = response_data["response"]
+        #response = generate('llama3', text)
+        #content = response['response']
+
+
         #client.chat_postMessage(channel=channel,text=content)
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
         client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
