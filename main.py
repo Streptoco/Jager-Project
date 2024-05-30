@@ -9,4 +9,4 @@ def print_hello():
 
 if __name__ == '__main__':
     #app.run(host='0.0.0.0', port=5000, debug=True)
-    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.cert', 'key.key'))
+    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.crt', 'key.key'))
