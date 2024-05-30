@@ -66,6 +66,6 @@ def onMessage(message):
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
         client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
         client.post_sending()
-#app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=5000, debug=True)
 #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.crt', 'key.key'))
-app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
