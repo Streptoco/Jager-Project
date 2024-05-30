@@ -8,9 +8,10 @@ import requests
 from jager_common.slack_client import SlackClient
 import messaging_parser
 from main import *
+from ollama import generate
 
-#app = Flask(__name__)
-eventAdapter = eventAdapter("407928f31731db7fa3d02490ae1d0f3f", '/slack/events', app)
+app = Flask(__name__)
+eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 
 
 #client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
@@ -54,15 +55,17 @@ def onMessage(message):
             "prompt": text,
             "stream": False
         }
-        response = requests.post(generateUrl, json=body)
-        response_data = json.loads(response.text)
+        #response = requests.post(generateUrl, json=body)
+        #response_data = json.loads(response.text)
         print("FOR ME!")
-        # content = response_data["message"]["content"]
-        content = response_data["response"]
+        #content = response_data["message"]["content"]
+        #content = response_data["response"]
+        response = generate('llama3', text)
+        content = response['response']
         #client.chat_postMessage(channel=channel,text=content)
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
         client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
         client.post_sending()
-
-
-#app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=5000, debug=True)
+#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.crt', 'key.key'))
+#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
