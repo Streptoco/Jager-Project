@@ -10,7 +10,7 @@ import messaging_parser
 from main import *
 
 #app = Flask(__name__)
-eventAdapter = eventAdapter("407928f31731db7fa3d02490ae1d0f3f", '/slack/events', app)
+eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 
 
 #client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
@@ -63,6 +63,5 @@ def onMessage(message):
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
         client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
         client.post_sending()
-
 
 #app.run(host='0.0.0.0', port=5000, debug=True)
