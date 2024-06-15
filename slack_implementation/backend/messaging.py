@@ -78,10 +78,11 @@ def onMessage(message):
         #prompt_response = requests.get(dbUrl + 'queryDB/' + '?prompt=' + text)
         params = {'prompt': text}
         print(dbUrl + '?prompt=' + text)
-        print(params)
         prompt_response = requests.get(dbUrl + 'queryDB/', params=params)
+        print(params)
         content = json.loads(prompt_response.text)
-        client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
+        print(content)
+        client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
         client.post_sending()
 
 #app.run(host='0.0.0.0', port=5000, debug=True)
