@@ -3,7 +3,8 @@ import ollama
 from chromadb.config import Settings
 from flask import Flask, request, jsonify
 
-persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
+#persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
+persistDirectory = "/opt/chromadb"
 #chromaClient = chromadb.Client(Settings(persist_directory=persistDirectory))
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
 collection = chromaClient.get_or_create_collection("slack_collection")
