@@ -28,7 +28,7 @@ for i, d in enumerate(documents):
     )
 
     # an example prompt
-prompt = "sis someone angry on someone else in the converion?"
+prompt = "does somebody seems to be angry?"
 
 # generate an embedding for the prompt and retrieve the most relevant doc
 response = ollama.embeddings(

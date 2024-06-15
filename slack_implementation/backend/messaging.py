@@ -12,10 +12,6 @@ from ollama import generate
 
 app = Flask(__name__)
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
-
-
-#client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-#bot = client.api_call("auth.test")['user_id']
 client = SlackClient()
 
 # local ollama instance
@@ -66,6 +62,8 @@ def onMessage(message):
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
         client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
         client.post_sending()
-app.run(host='0.0.0.0', port=5000, debug=True)
-#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('cert.crt', 'key.key'))
-#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+
+
+
+#app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
