@@ -42,10 +42,12 @@ def query_db():
     )
     data = results['documents'][0][0]
     # Need to be replaced with and http request to the GPU Cluster if possible
+    print("the question asked: ", prompt)
+    print("the data we use is ", data)
     output = ollama.generate(
         model="llama3",
         prompt=f"You are a slack assistant named Jager, your purpose is to help us search the history of our "
-               f"conversations but you don't need to mention this. Using this data: {data}. Respond to this prompt: {prompt}"
+               f"conversations but you don't need to mention this. Using this data only: {data}. Respond to this prompt: {prompt}"
     )
     return jsonify(output['response'])
 
