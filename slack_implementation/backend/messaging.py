@@ -28,15 +28,6 @@ def onMessage(message):
     message_ts = event.get('ts')
     user_guid = event.get('user')
     user = messaging_parser.get_real_name(message, client)
-    postToDatabaseBody = {
-        "timestamp": message_ts,
-        "user": user,
-        "text": text,
-        "channel": channel
-    }
-    add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
-    add_to_db_response_data = json.loads(add_to_db_response.text)
-    print(add_to_db_response_data)
     if "@"+client.bot in text and user_guid != client.bot and client.check_if_can_send():
         print("Bot GUID:" + client.bot)
         print("Username: " + user)
@@ -84,6 +75,17 @@ def onMessage(message):
         print(content)
         client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
         client.post_sending()
+    else:
+        #channel_real_name = messaging_parser.get_channel_real_name(message, client)
+        postToDatabaseBody = {
+            "timestamp": message_ts,
+            "user": user,
+            "text": text,
+            "channel": channel
+        }
+    add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
+    add_to_db_response_data = json.loads(add_to_db_response.text)
+    print(add_to_db_response_data)
 
 #app.run(host='0.0.0.0', port=5000, debug=True)
 app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
