@@ -27,7 +27,7 @@ def addToDB():
         documents=[data_to_add]
     )
     print(collection)
-    response = {'data': data_to_add, 'embeddings': embedded_data}
+    response = {'data': data_to_add}
     return jsonify(response)
 
 @db_app.route('/queryDB', methods=['GET'])
