@@ -18,7 +18,7 @@ client = SlackClient()
 # local ollama instance
 chatUrl = 'http://localhost:11434/api/chat'
 generateUrl = 'http://localhost:11434/api/generate'
-dbUrl = 'http://localhost:4090/addToDB'
+dbUrl = 'http://localhost:4090/'
 
 @eventAdapter.on('message')
 def onMessage(message):
@@ -34,9 +34,9 @@ def onMessage(message):
         "text": text,
         "channel": channel
     }
-    response = requests.post(dbUrl, json=postToDatabaseBody)
-    response_data = json.loads(response.text)
-    print(response_data)
+    add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
+    add_to_db_response_data = json.loads(add_to_db_response.text)
+    print(add_to_db_response_data)
     if "@"+client.bot in text and user_guid != client.bot and client.check_if_can_send():
         print("Bot GUID:" + client.bot)
         print("Username: " + user)
@@ -67,10 +67,19 @@ def onMessage(message):
         print("FOR ME!")
         #content = response_data["message"]["content"]
         #content = response_data["response"]
-        response = generate('llama3', text)
-        content = response['response']
+
+        #Generate a respone based of nothing, just like a very stupid GPT
+        #response = generate('llama3', text)
+        #content = response['response']
+
         #client.chat_postMessage(channel=channel,text=content)
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
+
+        #prompt_response = requests.get(dbUrl + 'queryDB/' + '?prompt=' + text)
+        params = {'prompt': text}
+        print(params)
+        prompt_response = requests.get(dbUrl + 'queryDB/', params=params)
+        content = json.loads(prompt_response.text)
         client.slack_client.chat_postMessage(channel=channel,text=content, thread_ts=message_ts)
         client.post_sending()
 
