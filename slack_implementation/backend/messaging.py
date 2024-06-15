@@ -63,26 +63,18 @@ def onMessage(message):
         #response = generate('llama3', text)
         #content = response['response']
 
-        #client.chat_postMessage(channel=channel,text=content)
-        #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
-
         prompt_response = requests.get(dbUrl + 'queryDB' + '?prompt=' + text)
-        params = {'prompt': text}
-        print(dbUrl + '?prompt=' + text)
-        #prompt_response = requests.get(dbUrl + 'queryDB/', params=params)
-        print(params)
         content = json.loads(prompt_response.text)
         print(content)
         client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
         client.post_sending()
     else:
         channel_real_name = messaging_parser.get_channel_real_name(message, client)
-        print(channel_real_name)
         postToDatabaseBody = {
             "timestamp": message_ts,
             "user": user,
             "text": text,
-            "channel": channel
+            "channel": channel_real_name
         }
     add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
     add_to_db_response_data = json.loads(add_to_db_response.text)
