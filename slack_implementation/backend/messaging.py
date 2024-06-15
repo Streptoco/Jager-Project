@@ -5,6 +5,7 @@ import os
 from flask import Flask
 from slackeventsapi import SlackEventAdapter as eventAdapter
 import requests
+from jager_common.chroma_db_listener import addToDB
 from jager_common.slack_client import SlackClient
 import messaging_parser
 from main import *
@@ -26,6 +27,13 @@ def onMessage(message):
     message_ts = event.get('ts')
     user_guid = event.get('user')
     user = messaging_parser.get_real_name(message, client)
+    postToDatabaseBody = {
+        "timestamp": message_ts,
+        "user": user,
+        "text": text,
+        "channel": channel
+    }
+    addToDB(postToDatabaseBody)
     if "@"+client.bot in text and user_guid != client.bot and client.check_if_can_send():
         print("Bot GUID:" + client.bot)
         print("Username: " + user)
