@@ -18,6 +18,7 @@ client = SlackClient()
 # local ollama instance
 chatUrl = 'http://localhost:11434/api/chat'
 generateUrl = 'http://localhost:11434/api/generate'
+dbUrl = 'http://localhost:4090/addToDB'
 
 @eventAdapter.on('message')
 def onMessage(message):
@@ -33,7 +34,9 @@ def onMessage(message):
         "text": text,
         "channel": channel
     }
-    addToDB(postToDatabaseBody)
+    response = requests.post(dbUrl, json=postToDatabaseBody)
+    response_data = json.loads(response.text)
+    print(response_data)
     if "@"+client.bot in text and user_guid != client.bot and client.check_if_can_send():
         print("Bot GUID:" + client.bot)
         print("Username: " + user)
