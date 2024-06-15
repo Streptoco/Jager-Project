@@ -75,7 +75,7 @@ def onMessage(message):
         #client.chat_postMessage(channel=channel,text=content)
         #client.slack_client.chat_update(channel=channel,ts=botMessage.get('ts'), text=content)
 
-        prompt_response = requests.get(dbUrl + 'queryDB/' + '?prompt=' + text)
+        prompt_response = requests.get(dbUrl + 'queryDB' + '?prompt=' + text)
         params = {'prompt': text}
         print(dbUrl + '?prompt=' + text)
         #prompt_response = requests.get(dbUrl + 'queryDB/', params=params)
