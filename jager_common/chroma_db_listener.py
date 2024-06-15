@@ -7,9 +7,9 @@ persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chroma
 #chromaClient = chromadb.Client(Settings(persist_directory=persistDirectory))
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
 collection = chromaClient.get_or_create_collection("slack_collection")
-app = Flask(__name__)
+db_app = Flask(__name__)
 
-@app.route('/addToDB', methods=['POST'])
+@db_app.route('/addToDB', methods=['POST'])
 def addToDB():
     messageData = request.get_json()
     timestamp = messageData['timestamp']
@@ -28,7 +28,7 @@ def addToDB():
     response = {'data' : data_to_add, 'emeddings' : embedded_data}
     return jsonify(response)
 
-@app.route('/queryDB', methods=['GET'])
+@db_app.route('/queryDB', methods=['GET'])
 def query_db():
     messageData = request.args
     prompt = messageData['prompt']
@@ -45,7 +45,7 @@ def query_db():
     return jsonify(output['response'])
 
 if __name__ == '__main__':
-    #app.run(host='0.0.0.0', port=4090, debug=True)
-    app.run(host='0.0.0.0', port=4090, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+    db_app.run(host='0.0.0.0', port=4090, debug=True)
+    #db_app.run(host='0.0.0.0', port=4090, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
 
 
