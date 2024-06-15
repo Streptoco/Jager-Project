@@ -77,6 +77,7 @@ def onMessage(message):
 
         #prompt_response = requests.get(dbUrl + 'queryDB/' + '?prompt=' + text)
         params = {'prompt': text}
+        print(dbUrl + '?prompt=' + text)
         print(params)
         prompt_response = requests.get(dbUrl + 'queryDB/', params=params)
         content = json.loads(prompt_response.text)
