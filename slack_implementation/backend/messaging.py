@@ -76,7 +76,8 @@ def onMessage(message):
         client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
         client.post_sending()
     else:
-        #channel_real_name = messaging_parser.get_channel_real_name(message, client)
+        channel_real_name = messaging_parser.get_channel_real_name(message, client)
+        print(channel_real_name)
         postToDatabaseBody = {
             "timestamp": message_ts,
             "user": user,

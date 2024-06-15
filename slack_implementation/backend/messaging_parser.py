@@ -8,5 +8,5 @@ def get_real_name(message, client):
 def get_channel_real_name(message, client):
     event = message.get('event', {})
     channel = event.get('channel')
-    responeUser = client.slack_client.users_info(channel=channel)
-    return responeUser['channel']['real_name']
+    responeUser = client.slack_client.conversations_info(channel=channel)
+    return responeUser['channel']['name']
