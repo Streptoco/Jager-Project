@@ -40,6 +40,8 @@ def query_db():
         query_embeddings=[embedded_prompt["embedding"]],
         n_results=5
     )
+    for doc in results['documents']:
+        print(doc)
     #data = results['documents'][0][0]
     data = [result[0] for result in results['documents']]
     # Need to be replaced with and http request to the GPU Cluster if possible
