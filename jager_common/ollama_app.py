@@ -22,5 +22,5 @@ def ask_llama_question():
     return response
 
 if __name__ == '__main__':
-    ollama_app.run(host='0.0.0.0', port=4000, debug=True
+    ollama_app.run(host='0.0.0.0', port=4000, debug=True)
 
