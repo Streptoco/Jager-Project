@@ -8,8 +8,8 @@ from slack_sdk.errors import SlackApiError
 from slackeventsapi import SlackEventAdapter
 
 app = Flask(__name__)
-event_adapter = SlackEventAdapter('e819d448f99015c2b96815bf40de425f', '/slack/events', app)
-client = WebClient(token='xoxb-6991111420352-7274994487750-K1LprGD9Z4REVdlnbSdef8Me')
+event_adapter = SlackEventAdapter('', '/slack/events', app)
+client = WebClient(token='')
 
 
 def fetch_all_messages(channel_list):
