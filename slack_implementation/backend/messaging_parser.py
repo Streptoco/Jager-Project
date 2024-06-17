@@ -21,7 +21,7 @@ def fetch_all_messages(channel_list):
 
             while result['has_more']:
                 result = client.conversations_history(
-                    channel=channel,
+                    channel=channel['id'],
                     cursor=result['response_metadata']['next_cursor']
                 )
                 messages.extend(result['messages'])
