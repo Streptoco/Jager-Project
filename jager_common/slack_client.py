@@ -3,7 +3,7 @@ import os
 
 class SlackClient:
     def __init__(self):
-        self.slack_client = WebClient(token='xoxb-6991111420352-7274994487750-K1LprGD9Z4REVdlnbSdef8Me')
+        self.slack_client = WebClient(token='')
         self.bot = self.slack_client.api_call("auth.test")['user_id']
         self.num_of_messages = 0
 
