@@ -12,7 +12,7 @@ from main import *
 from ollama import generate
 
 app = Flask(__name__)
-eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
+eventAdapter = eventAdapter('e819d448f99015c2b96815bf40de425f', '/slack/events', app)
 client = SlackClient()
 
 # local ollama instance
@@ -80,5 +80,5 @@ def onMessage(message):
     add_to_db_response_data = json.loads(add_to_db_response.text)
     print(add_to_db_response_data)
 
-#app.run(host='0.0.0.0', port=5000, debug=True)
-app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+app.run(host='0.0.0.0', port=5000, debug=True)
+#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
