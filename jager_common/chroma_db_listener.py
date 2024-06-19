@@ -1,3 +1,6 @@
+import glob
+import os
+
 import chromadb
 import ollama
 from chromadb.config import Settings
@@ -9,6 +12,7 @@ persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chroma
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
 collection = chromaClient.get_or_create_collection("slack_collection")
 db_app = Flask(__name__)
+
 
 @db_app.route('/addToDB', methods=['POST'])
 def addToDB():
@@ -30,6 +34,7 @@ def addToDB():
     response = {'data': data_to_add}
     return jsonify(response)
 
+
 @db_app.route('/queryDB', methods=['GET'])
 def query_db():
     print("in /queryDB")
@@ -46,7 +51,7 @@ def query_db():
     data = []
     for i, doc_list in enumerate(documents):
         for j, doc in enumerate(doc_list):
-            print(j+1, doc)
+            print(j + 1, doc)
             data.append(doc)
     # Need to be replaced with and http request to the GPU Cluster if possible
     print("the question asked: ", prompt)
@@ -59,9 +64,32 @@ def query_db():
     return jsonify(output['response'])
 
 
+def get_latest_md_filename():
+    list_of_files = glob.glob(
+        'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend\\slack_messages_*.md')
+    latest_file = max(list_of_files, key=os.path.getctime)
+    print(latest_file)
+    return latest_file
+
+@db_app.route('/loadDB', methods=['GET'])
+def load_md_file_to_db():
+    filename = get_latest_md_filename()
+    with open(filename, 'r', encoding='utf-8' ) as file:
+        md_content = file.read()
+        chunks = md_content.split('## ')
+        i = 0
+        for chunk in chunks:
+            embedded_data = ollama.embeddings(model="all-minilm", prompt=chunk)
+            collection.add(
+                ids=[str(i)],
+                embeddings=[embedded_data["embedding"]],
+                documents=[chunk]
+            )
+            i += 1
+
+
+
 
 if __name__ == '__main__':
     db_app.run(host='0.0.0.0', port=4090, debug=True)
     #db_app.run(host='0.0.0.0', port=4090, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
-
-

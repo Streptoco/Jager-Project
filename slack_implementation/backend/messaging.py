@@ -96,7 +96,7 @@ def get_latest_md_filename():
     return latest_file
 
 if __name__ == '__main__':
-    get_latest_md_filename()
+    requests.get(dbUrl + 'loadDB')
     app.run(host='0.0.0.0', port=5000, debug=True)
     #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
 
