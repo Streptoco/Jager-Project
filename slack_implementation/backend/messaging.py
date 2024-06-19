@@ -10,10 +10,12 @@ from jager_common.slack_client import SlackClient
 import messaging_parser
 from main import *
 from ollama import generate
+import threading
 
 app = Flask(__name__)
-eventAdapter = eventAdapter('e819d448f99015c2b96815bf40de425f', '/slack/events', app)
+eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 client = SlackClient()
+lock = threading.Lock()
 
 # local ollama instance
 chatUrl = 'http://localhost:11434/api/chat'
@@ -28,12 +30,15 @@ def onMessage(message):
     message_ts = event.get('ts')
     user_guid = event.get('user')
     user = messaging_parser.get_real_name(message, client)
+    #in md file @jager and not @GUID
     if "@"+client.bot in text and user_guid != client.bot and client.check_if_can_send():
+        lock.acquire()
+        client.slack_client.chat_postMessage(channel=channel, text="Let me think...", thread_ts=message_ts)
         print("Bot GUID:" + client.bot)
         print("Username: " + user)
+        print("User GUID: " + user_guid)
         print("Message: " + text)
         print("Message timestamp: " + message_ts)
-        print(message)
         client.send_message()
         text = text.replace('<@' + client.bot + '>', '' + user + ': ')
         '''
@@ -65,10 +70,11 @@ def onMessage(message):
 
         prompt_response = requests.get(dbUrl + 'queryDB' + '?prompt=' + text)
         content = json.loads(prompt_response.text)
-        print(content)
+        print("bot answer: " + content)
         client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
         client.post_sending()
-    else:
+        lock.release()
+    elif user_guid != client.bot:
         channel_real_name = messaging_parser.get_channel_real_name(message, client)
         postToDatabaseBody = {
             "timestamp": message_ts,
@@ -76,9 +82,12 @@ def onMessage(message):
             "text": text,
             "channel": channel_real_name
         }
-    add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
-    add_to_db_response_data = json.loads(add_to_db_response.text)
-    print(add_to_db_response_data)
+        add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
+        add_to_db_response_data = json.loads(add_to_db_response.text)
+        print("message added to db: " + add_to_db_response_data)
+        return 200
 
-app.run(host='0.0.0.0', port=5000, debug=True)
-#app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
+    #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+

@@ -3,8 +3,8 @@ import ollama
 from chromadb.config import Settings
 from flask import Flask, request, jsonify
 
-#persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
-persistDirectory = "/opt/chromadb"
+persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
+#persistDirectory = "/opt/chromadb"
 #chromaClient = chromadb.Client(Settings(persist_directory=persistDirectory))
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
 collection = chromaClient.get_or_create_collection("slack_collection")
@@ -17,6 +17,7 @@ def addToDB():
     user = messageData['user']
     text = messageData['text']
     channel = messageData['channel']
+    print("in /addToDB")
     print(messageData)
     data_to_add = user + " @ " + channel + ": " + text
     # Need to be replaced with and http request to the GPU Cluster if possible
@@ -26,12 +27,12 @@ def addToDB():
         embeddings=[embedded_data["embedding"]],
         documents=[data_to_add]
     )
-    print(collection)
     response = {'data': data_to_add}
     return jsonify(response)
 
 @db_app.route('/queryDB', methods=['GET'])
 def query_db():
+    print("in /queryDB")
     messageData = request.args
     prompt = messageData['prompt']
     # Need to be replaced with and http request to the GPU Cluster if possible
@@ -40,19 +41,24 @@ def query_db():
         query_embeddings=[embedded_prompt["embedding"]],
         n_results=5
     )
-    for doc in results['documents']:
-        print(doc)
-    #data = results['documents'][0][0]
-    data = [result[0] for result in results['documents']]
+
+    documents = results.get('documents', [])
+    data = []
+    for i, doc_list in enumerate(documents):
+        for j, doc in enumerate(doc_list):
+            print(j+1, doc)
+            data.append(doc)
     # Need to be replaced with and http request to the GPU Cluster if possible
     print("the question asked: ", prompt)
     print("the data we use is ", data)
     output = ollama.generate(
         model="llama3",
         prompt=f"You are a slack assistant named Jager, your purpose is to help us search the history of our "
-               f"conversations but you don't need to mention this. Using this data only: {', '.join(data)}. Respond to this prompt: {prompt}"
+               f"conversations but you don't need to mention this. Using this data only: {data}. Respond to this prompt: {prompt}"
     )
     return jsonify(output['response'])
+
+
 
 if __name__ == '__main__':
     db_app.run(host='0.0.0.0', port=4090, debug=True)

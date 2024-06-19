@@ -1,4 +1,5 @@
 import datetime
+import os
 import re
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -8,8 +9,8 @@ from slack_sdk.errors import SlackApiError
 from slackeventsapi import SlackEventAdapter
 
 app = Flask(__name__)
-event_adapter = SlackEventAdapter('', '/slack/events', app)
-client = WebClient(token='')
+event_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
+client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 
 def fetch_all_messages(channel_list):
@@ -83,7 +84,7 @@ def convert_messages_to_markdown(messages):
 
 
 def save_markdown_to_file(content, filename):
-    with open(filename, 'w') as file:
+    with open(filename, 'w', encoding='utf-8') as file:
         file.write(content)
 
 
@@ -115,6 +116,19 @@ scheduler.start()
 
 # Fetch and save messages once on startup
 gather_and_save_messages()
+
+def get_real_name(message, client):
+    event = message.get('event', {})
+    user = event.get('user')
+    responeUser = client.slack_client.users_info(user=user)
+    return responeUser['user']['real_name']
+
+
+def get_channel_real_name(message, client):
+    event = message.get('event', {})
+    channel = event.get('channel')
+    responeUser = client.slack_client.conversations_info(channel=channel)
+    return responeUser['channel']['name']
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
