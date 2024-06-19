@@ -1,4 +1,5 @@
 import datetime
+import glob
 import json
 import slack_sdk as slack
 import os
@@ -11,6 +12,7 @@ import messaging_parser
 from main import *
 from ollama import generate
 import threading
+import datetime
 
 app = Flask(__name__)
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
@@ -87,7 +89,15 @@ def onMessage(message):
         print("message added to db: " + add_to_db_response_data)
         return 200
 
+def get_latest_md_filename():
+    list_of_files = glob.glob('C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend\\slack_messages_*.md')
+    latest_file = max(list_of_files, key=os.path.getctime)
+    print(latest_file)
+    return latest_file
+
 if __name__ == '__main__':
+    get_latest_md_filename()
     app.run(host='0.0.0.0', port=5000, debug=True)
     #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
+
 
