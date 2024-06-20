@@ -35,5 +35,6 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python script.py <parameter>")
         sys.exit(1)
-    text = sys.argv[1]
+    #text = sys.argv[1]
+    text = ' '.join(sys.argv[1:])
     main(text)

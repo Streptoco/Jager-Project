@@ -48,8 +48,10 @@ if __name__ == '__main__':
         private_key = paramiko.RSAKey(filename=private_key_path)
         client.connect('gpu.mta.ac.il', port=22, username='afikat', pkey=private_key, timeout=5)
         print('Connected successfully')
-        (stdin, stdout, stderr) = client.exec_command(
-            'sbatch --export=ALL,my_arg=\'can you explain shortly why the sky are blue?\' sbatch_gpu_simple_question')
+        prompt = "can you explain shortly why the sky are blue?"
+        submit_job_command = f"sbatch --export=ALL,my_arg='{prompt}' sbatch_gpu_simple_question"
+        print(submit_job_command)
+        (stdin, stdout, stderr) = client.exec_command(submit_job_command)
         submitted_job = stdout.read().decode('utf-8').strip()
         print('log printing: ', submitted_job)
         job_id = ''.join([char for char in submitted_job if char.isdigit()])
