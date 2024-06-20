@@ -13,7 +13,7 @@ class GPUClient:
         self.port = 22
         self.max_retries = 5
         self.retry_interval = 5
-        self.target_line_for_generate = '/api/generate'
+        self.target_line_for_generate = 'the Bot answer is:'
 
     def establish_connection(self):
         print('Establishing connection to GPU Cluster')
