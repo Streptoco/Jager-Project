@@ -15,4 +15,6 @@ if __name__ == '__main__':
         print("Usage: python script.py <parameter>")
         sys.exit(1)
     text = ' '.join(sys.argv[1:])
+    text = ' '.join(sys.argv[2:])
+    text = ' '.join(sys.argv[3:])
     main(text)

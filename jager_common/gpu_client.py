@@ -12,8 +12,9 @@ class GPUClient:
         self.hostname = 'gpu.mta.ac.il'
         self.port = 22
         self.max_retries = 5
-        self.retry_interval = 5
+        self.retry_interval = 8
         self.target_line_for_generate = 'the Bot answer is:'
+        self.prompt_engineer = "You are a slack assistant named Jager. your purpose is to help us search the history of our conversations but you dont mention this."
 
     def establish_connection(self):
         print('Establishing connection to GPU Cluster')
@@ -37,16 +38,24 @@ class GPUClient:
         print('Disconnecting from GPU Cluster')
         self.client.close()
 
-    def ask(self, prompt):
+    def ask(self, data, prompt):
         if self.connect() == 1:
-            submit_job_command = f"sbatch --export=ALL,my_arg='{prompt}' sbatch_gpu_simple_question"
+            data = data.replace(",", "\'\\, ")
+            submit_job_command = f"sbatch --export=ALL,prompt_engineer=\"{self.prompt_engineer}\",data_base=\"{data}\",prompt=\"{prompt}\" sbatch_gpu_simple_question"
             print(submit_job_command)
             (stdin, stdout, stderr) = self.client.exec_command(submit_job_command)
             submitted_job = stdout.read().decode('utf-8').strip()
+            time.sleep(2)
             print('log printing: ', submitted_job)
+            if 'Submitted batch job' not in submitted_job:
+                print('Failed to submit batch job')
+                return None
+
             job_id = ''.join([char for char in submitted_job if char.isdigit()])
             print(job_id)
-            self.wait_for_job_to_end(job_id)
+            job_status = self.wait_for_job_to_end(job_id)
+            if job_status == 0:
+                return None
             #DEBUG PRINTS
             #print('cat command: ', 'cat job-' + job_id + '.out')
             (stdin, stdout, stderr) = self.client.exec_command('cat job-' + job_id + '.out')
@@ -56,6 +65,8 @@ class GPUClient:
             print('bot answer: ', bot_answer)
             self.disconnect()
             return bot_answer
+        else:
+            return None
 
     def extract_answer(self, job_output):
         lines = job_output.splitlines()
@@ -82,42 +93,11 @@ class GPUClient:
             i += 1
             if i > 200:
                 print("Job did not complete within 200 seconds")
-                break
+                return 0
             if self.check_if_job_completed(job_id):
                 print(f"Job {job_id} is still running...")
                 time.sleep(interval)
             else:
                 print(f"Job {job_id} has completed.")
-                break
+                return 1
 
-
-#if __name__ == '__main__':
-    '''
-    print('Establishing connection to GPU Cluster')
-    try:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        private_key_path = 'C:\\Users\\AfikAtias\\Desktop\\afikat-hpc.key'
-        private_key = paramiko.RSAKey(filename=private_key_path)
-        client.connect('gpu.mta.ac.il', port=22, username='afikat', pkey=private_key, timeout=5)
-        print('Connected successfully')
-        prompt = "can you explain shortly why the sky are blue?"
-        submit_job_command = f"sbatch --export=ALL,my_arg='{prompt}' sbatch_gpu_simple_question"
-        print(submit_job_command)
-        (stdin, stdout, stderr) = client.exec_command(submit_job_command)
-        submitted_job = stdout.read().decode('utf-8').strip()
-        print('log printing: ', submitted_job)
-        job_id = ''.join([char for char in submitted_job if char.isdigit()])
-        print(job_id)
-        wait_for_job_to_end(job_id, client)
-        #DEBUG PRINTS
-        #print('cat command: ', 'cat job-' + job_id + '.out')
-        (stdin, stdout, stderr) = client.exec_command('cat job-' + job_id + '.out')
-        job_output = stdout.read().decode('utf-8').strip()
-        #print('log printing: ', job_output)
-        bot_answer = job_output.strip().splitlines()[-1]
-        print('bot answer: ', bot_answer)
-        client.close()
-    except TimeoutError as e:
-        print(e)
-    '''

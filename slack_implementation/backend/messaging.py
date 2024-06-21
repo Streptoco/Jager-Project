@@ -84,9 +84,9 @@ def onMessage(message):
             "text": text,
             "channel": channel_real_name
         }
-        add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
-        add_to_db_response_data = json.loads(add_to_db_response.text)
-        print("message added to db: " + add_to_db_response_data)
+        #add_to_db_response = requests.post(dbUrl + 'addToDB', json=postToDatabaseBody)
+        #add_to_db_response_data = json.loads(add_to_db_response.text)
+        #print("message added to db: " + add_to_db_response_data)
         return 200
 
 def get_latest_md_filename():

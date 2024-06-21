@@ -1,10 +1,13 @@
 import glob
+import json
 import os
+import shlex
 
 import chromadb
 import ollama
 from chromadb.config import Settings
 from flask import Flask, request, jsonify
+from jager_common import gpu_client
 
 persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
 #persistDirectory = "/opt/chromadb"
@@ -12,6 +15,7 @@ persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chroma
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
 collection = chromaClient.get_or_create_collection("slack_collection")
 db_app = Flask(__name__)
+gpuClient = gpu_client.GPUClient()
 
 
 @db_app.route('/addToDB', methods=['POST'])
@@ -44,24 +48,22 @@ def query_db():
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
         query_embeddings=[embedded_prompt["embedding"]],
-        n_results=5
+        n_results=10
     )
 
     documents = results.get('documents', [])
-    data = []
+    data = ""
     for i, doc_list in enumerate(documents):
         for j, doc in enumerate(doc_list):
-            print(j + 1, doc)
-            data.append(doc)
+            #print(j + 1, doc)
+            data = data + doc
     # Need to be replaced with and http request to the GPU Cluster if possible
     print("the question asked: ", prompt)
     print("the data we use is ", data)
-    output = ollama.generate(
-        model="llama3",
-        prompt=f"You are a slack assistant named Jager, your purpose is to help us search the history of our "
-               f"conversations but you don't need to mention this. Using this data only: {data}. Respond to this prompt: {prompt}"
-    )
-    return jsonify(output['response'])
+    output = gpuClient.ask(data, prompt)
+    if output is None:
+        return jsonify("Sorry, I had an internal error. please try again later.")
+    return jsonify(output)
 
 
 def get_latest_md_filename():
@@ -71,10 +73,11 @@ def get_latest_md_filename():
     print(latest_file)
     return latest_file
 
+
 @db_app.route('/loadDB', methods=['GET'])
 def load_md_file_to_db():
     filename = get_latest_md_filename()
-    with open(filename, 'r', encoding='utf-8' ) as file:
+    with open(filename, 'r', encoding='utf-8') as file:
         md_content = file.read()
         chunks = md_content.split('## ')
         i = 0
@@ -86,8 +89,7 @@ def load_md_file_to_db():
                 documents=[chunk]
             )
             i += 1
-
-
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 
 if __name__ == '__main__':
