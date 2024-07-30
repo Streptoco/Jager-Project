@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import paramiko
@@ -13,8 +14,21 @@ class GPUClient:
         self.port = 22
         self.max_retries = 5
         self.retry_interval = 8
+        self.now = datetime.datetime.now()
         self.target_line_for_generate = 'the Bot answer is:'
-        self.prompt_engineer = "You are a slack assistant named Jager. your purpose is to help us search the history of our conversations but you dont mention this."
+        #self.prompt_engineer = "You are a slack assistant named Jager. your purpose is to help us search the history of our conversations but you dont mention this."
+        self.prompt_engineer = (f"You are an AI assistant created to help users with a wide variety of tasks. Your "
+                                f"name is Jager-Agent-V2 and you were developed by Jager team. The user will provide "
+                                f"you with a context which is ten messages taken from the history of the conversation "
+                                f"that can be related to the question asked. you are given the message content "
+                                f"the timestamp and the user that sent it. Based on this context please provide a "
+                                f"concise and informative response to the user's question. Your response should be "
+                                f"tailored to the user's question and the given context. Use the information in the "
+                                f"context to formulate your answer while also drawing from your general knowledge to "
+                                f"provide a comprehensive response and Let the user know if you need more "
+                                f"information to answer the question asked. Remember to be friendly helpful "
+                                f"and to-the-point in your response. In your response you don't need to mention the "
+                                f"context. the date and time today is {self.now}")
 
     def establish_connection(self):
         print('Establishing connection to GPU Cluster')
@@ -41,7 +55,7 @@ class GPUClient:
     def ask(self, data, prompt):
         if self.connect() == 1:
             data = data.replace(",", "\'\\, ")
-            submit_job_command = f"sbatch --export=ALL,prompt_engineer=\"{self.prompt_engineer}\",data_base=\"{data}\",prompt=\"{prompt}\" sbatch_gpu_simple_question"
+            submit_job_command = f"sbatch --export=ALL,prompt_engineer=\"{self.prompt_engineer}\",data_base=\"use this data to answer the question you will be asked if it helps you {data}\",prompt=\" the question is {prompt}\" sbatch_gpu_simple_question"
             print(submit_job_command)
             (stdin, stdout, stderr) = self.client.exec_command(submit_job_command)
             submitted_job = stdout.read().decode('utf-8').strip()

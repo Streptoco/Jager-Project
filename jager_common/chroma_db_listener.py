@@ -48,7 +48,7 @@ def query_db():
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
         query_embeddings=[embedded_prompt["embedding"]],
-        n_results=10
+        n_results=2
     )
 
     documents = results.get('documents', [])
@@ -57,7 +57,6 @@ def query_db():
         for j, doc in enumerate(doc_list):
             #print(j + 1, doc)
             data = data + doc
-    # Need to be replaced with and http request to the GPU Cluster if possible
     print("the question asked: ", prompt)
     print("the data we use is ", data)
     output = gpuClient.ask(data, prompt)
@@ -76,12 +75,16 @@ def get_latest_md_filename():
 
 @db_app.route('/loadDB', methods=['GET'])
 def load_md_file_to_db():
+    print("in /loadDB")
     filename = get_latest_md_filename()
     with open(filename, 'r', encoding='utf-8') as file:
         md_content = file.read()
         chunks = md_content.split('## ')
         i = 0
         for chunk in chunks:
+            #Skipping the quetstions and the bot responses
+            if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk:
+                continue
             embedded_data = ollama.embeddings(model="all-minilm", prompt=chunk)
             collection.add(
                 ids=[str(i)],
@@ -89,7 +92,9 @@ def load_md_file_to_db():
                 documents=[chunk]
             )
             i += 1
-    return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+    print("loaded " + str(i) + " elements, collection size is: " + str(collection.count()))
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
 if __name__ == '__main__':
