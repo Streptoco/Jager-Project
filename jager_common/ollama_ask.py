@@ -14,10 +14,11 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python script.py <parameter>")
         sys.exit(1)
-    text = ' '.join(sys.argv[1:])
-    print(f'first text {text}')
-    text = ' '.join(sys.argv[2:])
-    print(f'second text {text}')
-    text = ' '.join(sys.argv[3:])
-    print(f'third text {text}')
+    prompt_eng = ' '.join(sys.argv[1:])
+    print(f'first text {prompt_eng}')
+    dataText = ' '.join(sys.argv[2:])
+    print(f'second text {dataText}')
+    question = ' '.join(sys.argv[3:])
+    print(f'third text {question}')
+    text = prompt_eng + dataText + question
     main(text)
