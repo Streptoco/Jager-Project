@@ -1,18 +1,12 @@
-import datetime
 import glob
 import json
-import slack_sdk as slack
 import os
-from flask import Flask
 from slackeventsapi import SlackEventAdapter as eventAdapter
 import requests
-from jager_common.chroma_db_listener import addToDB
 from jager_common.slack_client import SlackClient
 import messaging_parser
 from main import *
-from ollama import generate
 import threading
-import datetime
 
 app = Flask(__name__)
 eventAdapter = eventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
@@ -90,12 +84,14 @@ def onMessage(message):
         return 200
 
 def get_latest_md_filename():
-    list_of_files = glob.glob('C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend\\slack_messages_*.md')
+
+    list_of_files = glob.glob('/Users/yuvall/Desktop/FinishProject/Jager-Project/slack_implementation/backend/slack_messages_*.md')
     latest_file = max(list_of_files, key=os.path.getctime)
     print(latest_file)
     return latest_file
 
 if __name__ == '__main__':
+
     requests.get(dbUrl + 'loadDB')
     app.run(host='0.0.0.0', port=5000, debug=True)
     #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))

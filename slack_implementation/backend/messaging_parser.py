@@ -7,7 +7,6 @@ from flask import Flask
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from slackeventsapi import SlackEventAdapter
-
 app = Flask(__name__)
 event_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/events', app)
 client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
@@ -79,7 +78,7 @@ def convert_messages_to_markdown(messages):
         user = msg.get('user', 'unknown')
         text = msg.get('text', '')
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
-        markdown_content += f"### {user} ({timestamp})\n{text}\n\n"
+        markdown_content += f"### The user: {user} has sent the following message: {text} in timedate {timestamp}\n\n"
     return markdown_content
 
 

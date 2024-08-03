@@ -9,8 +9,8 @@ from chromadb.config import Settings
 from flask import Flask, request, jsonify
 from jager_common import gpu_client
 
-persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
-#persistDirectory = "/opt/chromadb"
+#persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
+persistDirectory = "/Users/yuvall/Desktop/chroma"
 #chromaClient = chromadb.Client(Settings(persist_directory=persistDirectory))
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
 collection = chromaClient.get_or_create_collection("slack_collection")
@@ -44,11 +44,12 @@ def query_db():
     print("in /queryDB")
     messageData = request.args
     prompt = messageData['prompt']
+    print(f'This is the prompt we query the db with: {prompt}')
     # Need to be replaced with and http request to the GPU Cluster if possible
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
         query_embeddings=[embedded_prompt["embedding"]],
-        n_results=2
+        n_results=10
     )
 
     documents = results.get('documents', [])
@@ -66,8 +67,9 @@ def query_db():
 
 
 def get_latest_md_filename():
-    list_of_files = glob.glob(
-        'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend\\slack_messages_*.md')
+
+    #list_of_files = glob.glob( 'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend\\slack_messages_*.md')
+    list_of_files = glob.glob('/Users/yuvall/Desktop/FinishProject/Jager-Project/slack_implementation/backend/slack_messages_*.md')
     latest_file = max(list_of_files, key=os.path.getctime)
     print(latest_file)
     return latest_file
