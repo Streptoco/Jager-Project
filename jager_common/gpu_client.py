@@ -57,8 +57,7 @@ class GPUClient:
     def ask(self, data, prompt):
         if self.connect() == 1:
             data = data.replace(",", "\'\\, ")
-            # submit_job_command = f"sbatch --export=ALL,prompt_engineer=\'{self.prompt_engineer}\",data_base=\"this is the context given to you {data}\",prompt=\" the question that you were asked is {prompt}\" sbatch_gpu_simple_question"
-            submit_job_command = f"sbatch --export=ALL,prompt_engineer='{self.prompt_engineer}',data_base='use this data to answer the question you will be asked if it helps you {data}',prompt='the question is {prompt}' sbatch_gpu_simple_question"
+            submit_job_command = f"sbatch --export=ALL,prompt_engineer=\'{self.prompt_engineer}\",data_base=\"this is the context given to you {data}\",prompt=\" the question that you were asked is {prompt}\" sbatch_gpu_simple_question"
             print(submit_job_command)
             (stdin, stdout, stderr) = self.client.exec_command(submit_job_command)
             submitted_job = stdout.read().decode('utf-8').strip()
