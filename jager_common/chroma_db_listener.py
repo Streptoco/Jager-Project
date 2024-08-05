@@ -47,11 +47,13 @@ def query_db():
     prompt = messageData['prompt']
     user = prompt.split(":")[0]
     prompt = prompt.replace(user, "")
+    prompt = prompt.strip()
+    eng_prompt = f"The user: {user} asked this question: {prompt}"
     # Need to be replaced with and http request to the GPU Cluster if possible
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
         query_embeddings=[embedded_prompt["embedding"]],
-        n_results=2
+        n_results=3
     )
 
     documents = results.get('documents', [])
@@ -62,7 +64,7 @@ def query_db():
             data = data + doc
     print(f"the question asked: {prompt} by the user {user} ")
     print("the data we use is ", data)
-    output = gpuClient.ask(data, prompt)
+    output = gpuClient.ask(data, eng_prompt)
     if output is None:
         return jsonify("Sorry, I had an internal error. please try again later.")
     return jsonify(output)
@@ -92,10 +94,12 @@ def load_md_file_to_db():
                 continue
             if i > 0:
                 prev_line = chunks[i-1]
+                prev_line = prev_line.replace('#', "")
             else:
                 prev_line = ""
             if i < len(chunks)-1:
                 next_line = chunks[i+1]
+                next_line = next_line.replace('#', "")
             else:
                 next_line = ""
             total_entry = prev_line + chunk + next_line
