@@ -1,6 +1,7 @@
 import glob
 import json
 import os
+import re
 import shlex
 
 import chromadb
@@ -44,6 +45,8 @@ def query_db():
     print("in /queryDB")
     messageData = request.args
     prompt = messageData['prompt']
+    user = prompt.split(":")[0]
+    prompt = prompt.replace(user, "")
     # Need to be replaced with and http request to the GPU Cluster if possible
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
@@ -57,7 +60,7 @@ def query_db():
         for j, doc in enumerate(doc_list):
             #print(j + 1, doc)
             data = data + doc
-    print("the question asked: ", prompt)
+    print(f"the question asked: {prompt} by the user {user} ")
     print("the data we use is ", data)
     output = gpuClient.ask(data, prompt)
     if output is None:
@@ -80,20 +83,37 @@ def load_md_file_to_db():
     with open(filename, 'r', encoding='utf-8') as file:
         md_content = file.read()
         chunks = md_content.split('## ')
-        i = 0
-        for chunk in chunks:
+        #chunks = [line.strip() for line in chunks]
+        annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
+        entry_id = 0
+        for i, chunk in enumerate(chunks):
             #Skipping the quetstions and the bot responses
-            if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk:
+            if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk or annoying_message.search(chunk):
                 continue
-            embedded_data = ollama.embeddings(model="all-minilm", prompt=chunk)
+            if i > 0:
+                prev_line = chunks[i-1]
+            else:
+                prev_line = ""
+            if i < len(chunks)-1:
+                next_line = chunks[i+1]
+            else:
+                next_line = ""
+            total_entry = prev_line + chunk + next_line
+            if entry_id == 4:
+                print("prev line: ", prev_line)
+                print("current line: ", chunk)
+                print("next line: ", next_line)
+                print("total enty: ", total_entry)
+                print("------------------------------------------------")
+            embedded_data = ollama.embeddings(model="all-minilm", prompt=total_entry)
             collection.add(
-                ids=[str(i)],
+                ids=[str(entry_id)],
                 embeddings=[embedded_data["embedding"]],
-                documents=[chunk]
+                documents=[total_entry]
             )
-            i += 1
+            entry_id += 1
 
-    print("loaded " + str(i) + " elements, collection size is: " + str(collection.count()))
+    print("loaded " + str(entry_id) + " elements, collection size is: " + str(collection.count()))
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
 
 
