@@ -2,8 +2,8 @@ import sys
 import ollama
 
 def main(prompt):
-    #response = ollama.generate('llama3', prompt)
-    response = ollama.generate('llama3:70b', prompt)
+    response = ollama.generate('llama3', prompt)
+    #response = ollama.generate('llama3:70b', prompt)
     content = response['response']
     print("the Bot answer is:\n")
     print(content)

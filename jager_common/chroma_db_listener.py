@@ -61,6 +61,7 @@ def query_db():
     for i, doc_list in enumerate(documents):
         for j, doc in enumerate(doc_list):
             #print(j + 1, doc)
+            #doc = doc.replace('#', "") #to remove unwanted #
             data = data + doc
     print(f"the question asked: {prompt} by the user {user} ")
     print("the data we use is ", data)
@@ -74,7 +75,7 @@ def get_latest_md_filename():
     list_of_files = glob.glob(
         'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend\\slack_messages_*.md')
     latest_file = max(list_of_files, key=os.path.getctime)
-    print(latest_file)
+    #print(latest_file)
     return latest_file
 
 
@@ -82,6 +83,7 @@ def get_latest_md_filename():
 def load_md_file_to_db():
     print("in /loadDB")
     filename = get_latest_md_filename()
+    print("The file that will load to the database is ", filename)
     with open(filename, 'r', encoding='utf-8') as file:
         md_content = file.read()
         chunks = md_content.split('## ')
@@ -102,6 +104,7 @@ def load_md_file_to_db():
                 next_line = next_line.replace('#', "")
             else:
                 next_line = ""
+            chunk = chunk.replace('#', "")
             total_entry = prev_line + chunk + next_line
             if entry_id == 4:
                 print("prev line: ", prev_line)
