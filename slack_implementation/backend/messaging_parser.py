@@ -17,6 +17,7 @@ def fetch_all_messages(channel_list):
     messages = []
     for channel in channel_list:
         try:
+            print("Channel Name: ", channel['name'])
             result = client.conversations_history(channel=channel['id'])
             messages.extend(result['messages'])
 
@@ -78,7 +79,9 @@ def convert_messages_to_markdown(messages):
     for msg in messages:
         user = msg.get('user', 'unknown')
         text = msg.get('text', '')
+        channel = msg.get('channel', '')
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
+        #print(f"### {user} ({timestamp}) @{channel}\n{text}\n\n")
         markdown_content += f"### {user} ({timestamp})\n{text}\n\n"
     return markdown_content
 

@@ -43,37 +43,17 @@ def onMessage(message):
         print("Message timestamp: " + message_ts)
         client.send_message()
         text = text.replace('<@' + client.bot + '>', '' + user + ': ')
-        '''
-        body = {
-            "model": "llama3",
-            "messages": [
-                {
-                    "role" : "user",
-                    "content": text
-                }
-            ],
-            "stream": False
-        }
-        '''
-        body = {
-            "model": "llama3",
-            "prompt": text,
-            "stream": False
-        }
-        #response = requests.post(generateUrl, json=body)
-        #response_data = json.loads(response.text)
         print("FOR ME!")
-        #content = response_data["message"]["content"]
-        #content = response_data["response"]
-
-        #Generate a respone based of nothing, just like a very stupid GPT
-        #response = generate('llama3', text)
-        #content = response['response']
-
-        prompt_response = requests.get(dbUrl + 'queryDB' + '?prompt=' + text)
-        content = json.loads(prompt_response.text)
-        print("bot answer: " + content)
-        client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
+        print(text)
+        if "please read all new messages" in text:
+            print("Fetching new data")
+            requests.get(dbUrl + 'loadDB')
+            client.slack_client.chat_postMessage(channel=channel, text="Finish reading all new messages.", thread_ts=message_ts)
+        else:
+            prompt_response = requests.get(dbUrl + 'queryDB' + '?prompt=' + text)
+            content = json.loads(prompt_response.text)
+            print("bot answer: " + content)
+            client.slack_client.chat_postMessage(channel=channel, text=content, thread_ts=message_ts)
         client.post_sending()
         lock.release()
     elif user_guid != client.bot:
@@ -95,8 +75,10 @@ def get_latest_md_filename():
     print(latest_file)
     return latest_file
 
+
+
 if __name__ == '__main__':
-    requests.get(dbUrl + 'loadDB')
+    #requests.get(dbUrl + 'loadDB')
     app.run(host='0.0.0.0', port=5000, debug=True)
     #app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=('fullchain.pem', 'privkey.pem'))
 

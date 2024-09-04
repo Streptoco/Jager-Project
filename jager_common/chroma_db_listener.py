@@ -14,6 +14,7 @@ persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chroma
 #persistDirectory = "/opt/chromadb"
 #chromaClient = chromadb.Client(Settings(persist_directory=persistDirectory))
 chromaClient = chromadb.PersistentClient(path=persistDirectory)
+#chromaClient.get_settings().allow_reset = True
 collection = chromaClient.get_or_create_collection("slack_collection")
 db_app = Flask(__name__)
 gpuClient = gpu_client.GPUClient()
@@ -53,7 +54,7 @@ def query_db():
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
         query_embeddings=[embedded_prompt["embedding"]],
-        n_results=3
+        n_results=2
     )
 
     documents = results.get('documents', [])
@@ -82,6 +83,8 @@ def get_latest_md_filename():
 @db_app.route('/loadDB', methods=['GET'])
 def load_md_file_to_db():
     print("in /loadDB")
+    #chromaClient.reset()
+    #collection = chromaClient.get_or_create_collection("slack_collection")
     filename = get_latest_md_filename()
     print("The file that will load to the database is ", filename)
     with open(filename, 'r', encoding='utf-8') as file:
@@ -92,7 +95,7 @@ def load_md_file_to_db():
         entry_id = 0
         for i, chunk in enumerate(chunks):
             #Skipping the quetstions and the bot responses
-            if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk or annoying_message.search(chunk):
+            if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk or annoying_message.search(chunk) or "please read all new messages" in chunk:
                 continue
             if i > 0:
                 prev_line = chunks[i-1]
@@ -106,12 +109,12 @@ def load_md_file_to_db():
                 next_line = ""
             chunk = chunk.replace('#', "")
             total_entry = prev_line + chunk + next_line
-            if entry_id == 4:
-                print("prev line: ", prev_line)
-                print("current line: ", chunk)
-                print("next line: ", next_line)
-                print("total enty: ", total_entry)
-                print("------------------------------------------------")
+            # if entry_id == 4:
+            #     print("prev line: ", prev_line)
+            #     print("current line: ", chunk)
+            #     print("next line: ", next_line)
+            #     print("total enty: ", total_entry)
+            #     print("------------------------------------------------")
             embedded_data = ollama.embeddings(model="all-minilm", prompt=total_entry)
             collection.add(
                 ids=[str(entry_id)],
