@@ -15,20 +15,21 @@ client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 def fetch_all_messages(channel_map):
     messages = []
-    for channel in channel_map:
+    for channel_id, channel_name in channel_map.items():  # Iterate over channel_map's items
         try:
-            result = client.conversations_history(channel=channel['id'])
+            print(f"Fetching messages from channel: {channel_name} (ID: {channel_id})")  # Debugging info
+            result = client.conversations_history(channel=channel_id)  # Use channel_id directly
             messages.extend(result['messages'])
 
-            while result['has_more']:
+            while result.get('has_more', False):  # Check if there are more messages
                 result = client.conversations_history(
-                    channel=channel['id'],
+                    channel=channel_id,
                     cursor=result['response_metadata']['next_cursor']
                 )
                 messages.extend(result['messages'])
 
         except SlackApiError as e:
-            print(f"Error fetching conversations: {e.response['error']}")
+            print(f"Error fetching conversations from {channel_name}: {e.response['error']}")
 
     return messages
 
