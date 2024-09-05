@@ -80,7 +80,7 @@ def convert_messages_to_markdown(messages, channel_map):
         text = msg.get('text', '')
         channel_id = msg.get('channel', 'unknown')
         channel_name = channel_map.get(channel_id, 'unknown channel')  # Lookup channel name
-        print(f"{channel_name}")
+        print(f"channel name fetched: {channel_name}")
         annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
         if "jageragent" in text or "jageragentv2" in text or "This message was deleted" in text or annoying_message.search(text)\
                 or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
