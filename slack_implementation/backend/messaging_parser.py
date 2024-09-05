@@ -35,7 +35,6 @@ def fetch_all_messages(channel_map):
         except SlackApiError as e:
             print(f"Error fetching conversations from {channel_name}: {e.response['error']}")
 
-    print("Message Map:", message_map)
     return message_map
 
 
@@ -65,7 +64,9 @@ def replace_user_ids_with_names(messages_map, user_mapping):
     for client_msg_id, (msg, channel_name) in messages_map.items():
         user_id = msg.get('user')
         if user_id and user_id in user_mapping:
+            print(msg['user'])
             msg['user'] = user_mapping[user_id]
+            print(msg['user'])
         if 'text' in msg:
             msg['text'] = replace_text_user_ids(msg['text'], user_mapping)
 
@@ -90,7 +91,7 @@ def convert_messages_to_markdown(messages_map):
                 or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
             continue
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
-        markdown_content += f"### {user}, {channel_name} ({timestamp})\n{text}\n\n"
+        markdown_content += f"### \n {user} sent the following message: {text} in channel: {channel_name} at: ({timestamp})\n"
     return markdown_content
 
 
