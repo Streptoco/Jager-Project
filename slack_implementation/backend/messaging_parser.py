@@ -79,6 +79,9 @@ def convert_messages_to_markdown(messages):
     for msg in messages:
         user = msg.get('user', 'unknown')
         text = msg.get('text', '')
+        annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
+        if "jageragent" in text or "jageragentv2" in text or "This message was deleted" in text or annoying_message.search(text) or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
+            continue
         channel = msg.get('channel', '')
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
         #print(f"### {user} ({timestamp}) @{channel}\n{text}\n\n")

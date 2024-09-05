@@ -99,8 +99,8 @@ def load_md_file_to_db():
         entry_id = 0
         for i, chunk in enumerate(chunks):
             #Skipping the quetstions and the bot responses
-            if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk or annoying_message.search(chunk) or "please read all new messages" in chunk:
-                continue
+            # if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk or annoying_message.search(chunk) or "please read all new messages" in chunk:
+            #     continue
             if i > 0:
                 prev_line = chunks[i-1]
                 prev_line = prev_line.replace('#', "")
