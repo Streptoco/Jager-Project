@@ -13,11 +13,10 @@ event_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], '/slack/ev
 client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
 
-def fetch_all_messages(channel_list):
+def fetch_all_messages(channel_map):
     messages = []
-    for channel in channel_list:
+    for channel in channel_map:
         try:
-            print("Channel Name: ", channel['name'])
             result = client.conversations_history(channel=channel['id'])
             messages.extend(result['messages'])
 
@@ -74,15 +73,18 @@ def replace_text_user_ids(text, user_mapping):
     return re.sub(r'<@(\w+)>', replace_match, text)
 
 
-def convert_messages_to_markdown(messages):
+def convert_messages_to_markdown(messages, channel_map):
     markdown_content = ""
     for msg in messages:
         user = msg.get('user', 'unknown')
         text = msg.get('text', '')
+        channel_id = msg.get('channel', 'unknown')
+        channel_name = channel_map.get(channel_id, 'unknown channel')  # Lookup channel name
+        print(f"{channel_name}")
         annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
-        if "jageragent" in text or "jageragentv2" in text or "This message was deleted" in text or annoying_message.search(text) or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
+        if "jageragent" in text or "jageragentv2" in text or "This message was deleted" in text or annoying_message.search(text)\
+                or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
             continue
-        channel = msg.get('channel', '')
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
         #print(f"### {user} ({timestamp}) @{channel}\n{text}\n\n")
         markdown_content += f"### {user} ({timestamp})\n{text}\n\n"
@@ -96,23 +98,24 @@ def save_markdown_to_file(content, filename):
 
 
 def fetch_all_channels():
+    # Fetch channels and return a mapping of channel IDs to names
+    channel_map = {}
     try:
-        response = client.conversations_list(types='public_channel,private_channel')
-        channels = response['channels']
-        return channels
+        result = client.conversations_list()
+        for channel in result['channels']:
+            channel_map[channel['id']] = channel['name']
     except SlackApiError as e:
         print(f"Error fetching channels: {e.response['error']}")
-        return []
+    return channel_map
 
 
 def gather_and_save_messages():
-    get_channel_ids = fetch_all_channels()
-    all_messages = fetch_all_messages(get_channel_ids)
+    channel_map = fetch_all_channels()
+    all_messages = fetch_all_messages(channel_map)
     user_mapping = get_user_mapping(all_messages)
     messages_with_names = replace_user_ids_with_names(all_messages, user_mapping)
-    markdown_content = convert_messages_to_markdown(all_messages)
+    markdown_content = convert_messages_to_markdown(messages_with_names, channel_map)
     directory = 'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend'
-
     # Create the filename with the specified directory
     filename = os.path.join(directory, f"slack_messages_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.md")
 
