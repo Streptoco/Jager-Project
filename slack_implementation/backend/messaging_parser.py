@@ -65,11 +65,11 @@ def replace_user_ids_with_names(messages_map, user_mapping):
     for client_msg_id, (msg, channel_name) in messages_map.items():
         user_id = msg.get('user')
         if user_id and user_id in user_mapping:
-            print(msg['user'])
             msg['user'] = user_mapping[user_id]
-            print(msg['user'])
         if 'text' in msg:
-            msg['text'] = replace_text_user_ids(msg['text'], user_mapping)
+            original_text = msg['text']
+            msg['text'] = replace_text_user_ids(original_text, user_mapping)
+            print(f"Replaced text from: '{original_text}' to: '{msg['text']}'")
 
     return messages_map
 
@@ -77,8 +77,11 @@ def replace_user_ids_with_names(messages_map, user_mapping):
 def replace_text_user_ids(text, user_mapping):
     def replace_match(match):
         user_id = match.group(1)
-        return f"@{user_mapping.get(user_id, user_id)}"
+        username = user_mapping.get(user_id, user_id)
+        print(f"Replacing user ID: {user_id} with username: {username}")  # Debugging output
+        return f"@{username}"
 
+    # Match user IDs in the format <@USER_ID>
     return re.sub(r'<@(\w+)>', replace_match, text)
 
 
