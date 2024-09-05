@@ -57,6 +57,7 @@ def get_user_mapping(messages):
         if user_id:
             user_mapping[user_id] = fetch_user_info(user_id)
     user_mapping["U0782V8EBN2"] = "jageragentv2" #add the bot id hard coded
+    user_mapping["U07LRAUQCKA"] = "jageragentv3"
     return user_mapping
 
 
@@ -89,7 +90,7 @@ def convert_messages_to_markdown(messages_map):
         text = msg.get('text', '')
         annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
         if "jageragent" in text or "jageragentv2" in text or "This message was deleted" in text or annoying_message.search(text)\
-                or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
+                or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user or "jageragentv3" in user:
             continue
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
         markdown_content += f"### \n {user} sent the following message: {text} in channel: {channel_name} at: ({timestamp})\n"

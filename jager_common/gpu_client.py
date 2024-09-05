@@ -18,14 +18,14 @@ class GPUClient:
         self.target_line_for_generate = 'the Bot answer is:'
         #self.prompt_engineer = "You are a slack assistant named Jager. your purpose is to help us search the history of our conversations but you dont mention this."
         self.prompt_engineer = (
-            "You are Jager-Agent-V2, an AI assistant developed by the Jager team to help users with various tasks. "
-            "You do not need to introduce yourself."
-            " Your responses should be concise and informative, tailored to the user's questions. "
-            "Use the provided context, which includes user messages with timestamps, to formulate your answers. "
-            "If the question is unrelated to the context, rely on your general knowledge"
-            " or indicate if you don't know the answer. "
-            "Always be friendly and helpful, and feel free to ask for more information if needed. "
-            "Today's date and time is {self.now}."
+            f"You are Jager-Agent-V3 an AI assistant developed by the Jager team to help users with various tasks. "
+            f"You do not need to introduce yourself."
+            f" Your responses should be concise and informative tailored to the user's questions. "
+            f"Use the provided context which includes user messages with timestamps to formulate your answers. "
+            f"If the question is unrelated to the context rely on your general knowledge"
+            f"or indicate if you don't know the answer. "
+            f"Always be friendly and helpful and feel free to ask for more information if needed. "
+            f"Today's date and time is {self.now}."
         )
 
     def establish_connection(self):
@@ -52,7 +52,7 @@ class GPUClient:
 
     def ask(self, data, prompt):
         if self.connect() == 1:
-            data = data.replace(",", "\'\\, ")
+            data = data.replace(",", "")
             submit_job_command = f"sbatch --export=ALL,prompt_engineer=\"{self.prompt_engineer}\",data_base=\"base you answer on this data {data}\",prompt=\" answer this question: {prompt}\" sbatch_gpu_simple_question"
             print(submit_job_command)
             (stdin, stdout, stderr) = self.client.exec_command(submit_job_command)
