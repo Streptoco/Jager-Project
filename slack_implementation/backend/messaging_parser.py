@@ -20,6 +20,9 @@ def fetch_all_messages(channel_map):
             print(f"Fetching messages from channel: {channel_name} (ID: {channel_id})")  # Debugging info
             result = client.conversations_history(channel=channel_id)  # Use channel_id directly
 
+            for msg in result['messages']:
+                    message_map[msg['client_msg_id']] = (msg, channel_name)
+
             while result.get('has_more', False):  # Check if there are more messages
                 result = client.conversations_history(
                     channel=channel_id,
@@ -32,6 +35,7 @@ def fetch_all_messages(channel_map):
         except SlackApiError as e:
             print(f"Error fetching conversations from {channel_name}: {e.response['error']}")
 
+    print("Message Map:", message_map)
     return message_map
 
 
@@ -81,14 +85,12 @@ def convert_messages_to_markdown(messages_map):
     for client_msg_id, (msg, channel_name) in messages_map.items():
         user = msg.get('user', 'unknown')
         text = msg.get('text', '')
-        print(f"channel name fetched {channel_name}")
         annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
         if "jageragent" in text or "jageragentv2" in text or "This message was deleted" in text or annoying_message.search(text)\
                 or "please read all new messages" in text or "has joined the channel" in text or "jageragentv2" in user or "jageragent" in user:
             continue
         timestamp = datetime.datetime.fromtimestamp(float(msg.get('ts', 0)))
-        #print(f"### {user} ({timestamp}) @{channel}\n{text}\n\n")
-        markdown_content += f"### {user} ({timestamp})\n{text}\n\n"
+        markdown_content += f"### {user}, {channel_name} ({timestamp})\n{text}\n\n"
     return markdown_content
 
 
