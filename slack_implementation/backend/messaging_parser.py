@@ -26,7 +26,7 @@ def fetch_all_messages(channel_map):
                     cursor=result['response_metadata']['next_cursor']
                 )
                 for msg in result['messages']:
-                    message_map[msg['client_msg_id']] = (msg, channel_name)
+                    message_map[msg.get('client_msg_id')] = (msg, channel_name)
 
 
         except SlackApiError as e:
@@ -46,7 +46,7 @@ def fetch_user_info(user_id):
 
 def get_user_mapping(messages):
     user_ids = set()
-    for msg in messages:
+    for client_msg_id, (msg, channel_name) in messages.items():
         user_ids.add(msg.get('user'))
 
     user_mapping = {}
