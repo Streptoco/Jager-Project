@@ -21,7 +21,7 @@ def fetch_all_messages(channel_map):
             result = client.conversations_history(channel=channel_id)  # Use channel_id directly
 
             for msg in result['messages']:
-                    message_map[msg['client_msg_id']] = (msg, channel_name)
+                    message_map[msg.get('client_msg_id')] = (msg, channel_name)
 
             while result.get('has_more', False):  # Check if there are more messages
                 result = client.conversations_history(
@@ -29,6 +29,7 @@ def fetch_all_messages(channel_map):
                     cursor=result['response_metadata']['next_cursor']
                 )
                 for msg in result['messages']:
+                    print(msg, channel_name)
                     message_map[msg.get('client_msg_id')] = (msg, channel_name)
 
 
