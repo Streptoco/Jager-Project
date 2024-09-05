@@ -107,7 +107,11 @@ def gather_and_save_messages():
     user_mapping = get_user_mapping(all_messages)
     messages_with_names = replace_user_ids_with_names(all_messages, user_mapping)
     markdown_content = convert_messages_to_markdown(all_messages)
-    filename = f"slack_messages_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.md"
+    directory = 'C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\slack_implementation\\backend'
+
+    # Create the filename with the specified directory
+    filename = os.path.join(directory, f"slack_messages_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.md")
+
     save_markdown_to_file(markdown_content, filename)
     print(f"Saved messages to {filename}")
 
