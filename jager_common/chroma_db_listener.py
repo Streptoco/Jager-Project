@@ -94,13 +94,8 @@ def load_md_file_to_db():
     with open(filename, 'r', encoding='utf-8') as file:
         md_content = file.read()
         chunks = md_content.split('## ')
-        #chunks = [line.strip() for line in chunks]
-        annoying_message = re.compile(r'afikat \(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\)\nhi')
         entry_id = 0
         for i, chunk in enumerate(chunks):
-            #Skipping the quetstions and the bot responses
-            # if "jageragent" in chunk or "jageragentv2" in chunk or "This message was deleted" in chunk or annoying_message.search(chunk) or "please read all new messages" in chunk:
-            #     continue
             if i > 0:
                 prev_line = chunks[i-1]
                 prev_line = prev_line.replace('#', "")
@@ -113,12 +108,6 @@ def load_md_file_to_db():
                 next_line = ""
             chunk = chunk.replace('#', "")
             total_entry = prev_line + chunk + next_line
-            # if entry_id == 4:
-            #     print("prev line: ", prev_line)
-            #     print("current line: ", chunk)
-            #     print("next line: ", next_line)
-            #     print("total enty: ", total_entry)
-            #     print("------------------------------------------------")
             embedded_data = ollama.embeddings(model="all-minilm", prompt=total_entry)
             # collection.add(
             #     ids=[str(entry_id)],
