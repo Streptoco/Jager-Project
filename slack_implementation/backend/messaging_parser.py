@@ -118,7 +118,7 @@ scheduler.add_job(gather_and_save_messages, 'interval', hours=3)
 scheduler.start()
 
 # Fetch and save messages once on startup
-gather_and_save_messages()
+#gather_and_save_messages()
 
 def get_real_name(message, client):
     event = message.get('event', {})

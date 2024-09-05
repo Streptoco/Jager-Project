@@ -3,12 +3,14 @@ import json
 import os
 import re
 import shlex
+import time
 
 import chromadb
 import ollama
 from chromadb.config import Settings
 from flask import Flask, request, jsonify
 from jager_common import gpu_client
+from slack_implementation.backend.messaging_parser import gather_and_save_messages
 
 persistDirectory = "C:\\Users\\AfikAtias\\PycharmProjects\\Jager-Project\\chromadb"
 #persistDirectory = "/opt/chromadb"
@@ -83,6 +85,8 @@ def get_latest_md_filename():
 @db_app.route('/loadDB', methods=['GET'])
 def load_md_file_to_db():
     print("in /loadDB")
+    gather_and_save_messages()
+    time.sleep(5)
     #chromaClient.reset()
     #collection = chromaClient.get_or_create_collection("slack_collection")
     filename = get_latest_md_filename()
@@ -116,10 +120,15 @@ def load_md_file_to_db():
             #     print("total enty: ", total_entry)
             #     print("------------------------------------------------")
             embedded_data = ollama.embeddings(model="all-minilm", prompt=total_entry)
-            collection.add(
-                ids=[str(entry_id)],
-                embeddings=[embedded_data["embedding"]],
-                documents=[total_entry]
+            # collection.add(
+            #     ids=[str(entry_id)],
+            #     embeddings=[embedded_data["embedding"]],
+            #     documents=[total_entry]
+            # )
+            collection.upsert(
+                     ids=[str(entry_id)],
+                     embeddings=[embedded_data["embedding"]],
+                     documents=[total_entry]
             )
             entry_id += 1
 
