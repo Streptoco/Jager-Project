@@ -29,7 +29,6 @@ def fetch_all_messages(channel_map):
                     cursor=result['response_metadata']['next_cursor']
                 )
                 for msg in result['messages']:
-                    print(msg, channel_name)
                     message_map[msg.get('client_msg_id')] = (msg, channel_name)
 
 
@@ -57,7 +56,7 @@ def get_user_mapping(messages):
     for user_id in user_ids:
         if user_id:
             user_mapping[user_id] = fetch_user_info(user_id)
-
+    user_mapping["U0782V8EBN2"] = "jageragentv2" #add the bot id hard coded
     return user_mapping
 
 
@@ -69,7 +68,6 @@ def replace_user_ids_with_names(messages_map, user_mapping):
         if 'text' in msg:
             original_text = msg['text']
             msg['text'] = replace_text_user_ids(original_text, user_mapping)
-            print(f"Replaced text from: '{original_text}' to: '{msg['text']}'")
 
     return messages_map
 
@@ -78,7 +76,6 @@ def replace_text_user_ids(text, user_mapping):
     def replace_match(match):
         user_id = match.group(1)
         username = user_mapping.get(user_id, user_id)
-        print(f"Replacing user ID: {user_id} with username: {username}")  # Debugging output
         return f"@{username}"
 
     # Match user IDs in the format <@USER_ID>
