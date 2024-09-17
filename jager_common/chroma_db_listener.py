@@ -56,7 +56,7 @@ def query_db():
     embedded_prompt = ollama.embeddings(model="all-minilm", prompt=prompt)
     results = collection.query(
         query_embeddings=[embedded_prompt["embedding"]],
-        n_results=2
+        n_results=3
     )
 
     documents = results.get('documents', [])
